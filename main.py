@@ -754,7 +754,7 @@ try:
                     zipf.writestr(nameDocAnexoCalculos,doc_anexoCalculos_bio.getvalue())
                     zipf.writestr(nameDocAnexoEquipos, doc_anexoEquipos_bio.getvalue())
                     zipf.writestr(nameDocAnexoPlanos, doc_anexoPlanos_bio.getvalue())
-                    zipf.writestr("merged.pdf", files_anexo3.getvalue())
+                    zipf.writestr("merged.pdftrials", files_anexo3.getvalue())
                     flagZip = 1
                     flagZip = [flagZip]
                     checkList = checkList + flagZip
