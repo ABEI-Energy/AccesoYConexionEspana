@@ -136,7 +136,6 @@ def insert_image_in_cell(doc, dic, picFile):
 user = st.text_input("Nombre redactor del documento")
 if user:
     user = user.strip().split(' ')
-    st.caption(user)
     auxUser = []
     for word in user:
         auxUser.append([*word][0])
