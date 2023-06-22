@@ -437,11 +437,9 @@ for uploaded_file in uploadedFiles:
         word = rd.reader(uploaded_file,0)
 
         if "PVsyst" in word:
-
             PVsyst_file = uploaded_file
 
         else:
-
             planos_file = uploaded_file
 
         # Datasheets se cogen según los datos
@@ -657,10 +655,27 @@ try:
 
     if ejes:
         if ejes == "Bi-poste":
-            pass
-            # "DATASHEETS/Estructuras/monolineplus-1p-datasheet.pdf"
+            fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet biposte.pdf"
+        elif ejes == "Monoposte":
+            fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet monoposte.pdf"
 
+    if inverterManuf and inverterModel:
+        if inverterManuf == "Huawei Technologies":
+            if inverterModel == "SUN200-330KTL-H1":
+                fileInverterAnexo = "DATASHEETS/Inversores/Huawei_SUN200-330KTL-H1_datasheet_en.pdf"
+        elif inverterManuf == "Siemens Gamesa":
+            # De momento no importa qué modelo porque vienen todos en un mismo documento
+            fileInverterAnexo = "DATASHEETS/Inversores/ELE-Proteus-PV-Inverters.pdf"
 
+    if pvFile:
+        # De momento sólo usan un tipo de fabricantes
+        fileModulosAnexo = "DATASHEETS/Módulos/Datasheet_Vertex_DEG21C.20_EN_2021_PA4_DEG21C.20_2021_PA3_EN_20210309 (3).pdf"
+
+    # Estos 3 documentos pertenecen al último anexo, así que primero los unimos 
+    
+    anexFiles = [fileEstructuraAnexo, fileInverterAnexo,fileModulosAnexo]
+
+    files_anexo3 = wt.pdfMerger(anexFiles) #devuelve un bytesIO, se accede con getvalue()
 
     if flagGenerar and fileModelo:
         with st.spinner("Generando documento"):
@@ -720,6 +735,9 @@ try:
                 doc_anexoEquipos.save(doc_anexoEquipos_bio)
                 doc_anexoEquipos_bio.seek(0)
                 nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
+
+            
+
 
                 doc_anexoPlanos_bio = io.BytesIO()
                 doc_anexoPlanos.save(doc_anexoPlanos_bio)
