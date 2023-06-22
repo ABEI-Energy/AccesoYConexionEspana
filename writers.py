@@ -7,7 +7,7 @@ from docx.shared import Cm
 from PIL import Image
 
 import numToLet as ntl
-from PyPDF2 import PdfWriter
+from PyPDF2 import PdfFileMerger 
 
 import io
 
@@ -312,10 +312,11 @@ def picWriter(docxFile, docxDict, rootLogos, logoC):
 
 def pdfMerger(files):
     tmp = io.BytesIO()
-    merger = PdfWriter()
+    merger = PdfFileMerger()
     for pdf in files:
         merger.append(pdf)
     merger.write(tmp)
+    tmp.seek(0)
     # return tmp.getvalue()
     return tmp
 

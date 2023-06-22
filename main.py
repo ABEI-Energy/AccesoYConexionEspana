@@ -671,6 +671,7 @@ try:
         # De momento sólo usan un tipo de fabricantes
         fileModulosAnexo = "DATASHEETS/Módulos/Datasheet_Vertex_DEG21C.20_EN_2021_PA4_DEG21C.20_2021_PA3_EN_20210309 (3).pdf"
 
+
     # Estos 3 documentos pertenecen al último anexo, así que primero los unimos 
     
     anexFiles = [fileEstructuraAnexo, fileInverterAnexo,fileModulosAnexo]
