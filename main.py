@@ -207,7 +207,7 @@ with col2:
             listadoMunicipiosProj.append(municipioProj)
             
         if int(numberMunic) != 1: 
-            mainDic['municipioProj'] = ', '.join(listadoMunicipiosProj[:-2]) + ' y ' + listadoMunicipiosProj[-1]
+            mainDic['municipioProj'] = ', '.join(listadoMunicipiosProj[:-1]) + ' y ' + listadoMunicipiosProj[-1]
             mainDic['municipioProjC'] = mainDic['municipioProj']
             mainDic['ccaaProj'] = dfMunicipios.loc[dfMunicipios['MUNICIPIO']==listadoMunicipiosProj[-1],'COMUNIDAD AUTÓNOMA'].item()
             mainDic['ccaaProjC'] = mainDic['ccaaProj']
@@ -226,6 +226,10 @@ with col4:
 
 with col5:
     longitud = st.text_input("Longitud del proyecto:")
+
+if latitud and longitud:
+    st.map({'lat':{"idx":float(latitud)},'lon':{"idx":float(longitud)},})
+
 
 areaProj = st.text_input("Área del proyecto [ha]:")
 
@@ -257,17 +261,17 @@ st.divider()
 
 if proyectoTipo == "Fotovoltáico":
 
+    produccionPlanta = st.text_input("Producción de la planta (MWh/año):")
+    if produccionPlanta:
+        mainDic['producAnual'] = normalize(produccionPlanta)
     col6, col7 = st.columns(2)
-
     with col6:
-        produccionPlanta = st.text_input("Producción de la planta (MWh/año):")
-        if produccionPlanta:
-            mainDic['producAnual'] = normalize(produccionPlanta)
-
-    with col7:
         toggle5MW = tog.st_toggle_switch("Menor o igual a 5 MW")
         optionsPV5 = ''
         # Check the toggle button state
+
+    with col7:
+
         if toggle5MW:
             optionsPV5 = st.text_input("Introduce la potencia instalada EN INVERSORES (MW):")
             mainDic['potProj5'] = "Sí"
@@ -374,7 +378,7 @@ if proyectoTipo == "Fotovoltáico":
                 municipio = st.text_input(f"Municipio {i+1}")
                 listadoMunicipios.append(municipio)
             if int(number) != 1: 
-                mainDic['municipiosAtravesados'] = ', '.join(listadoMunicipios[:-2]) + ' y ' + listadoMunicipios[-1]
+                mainDic['municipiosAtravesados'] = ', '.join(listadoMunicipios[:-1]) + ' y ' + listadoMunicipios[-1]
             else:
                 mainDic['municipiosAtravesados'] = listadoMunicipios[0]
 
