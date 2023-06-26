@@ -3,7 +3,6 @@ import datetime as dt
 import io
 import locale as lc
 from zipfile import ZipFile
-
 import pandas as pd
 import streamlit as st
 import streamlit_toggle as tog
@@ -360,6 +359,7 @@ if proyectoTipo == "Fotovoltáico":
             if ejes:
                 mainDic['disposicionEjes'] = ejes
 
+
         trafoManuf = st.selectbox("Fabricante del centro de transformación", dfTrafos['MANUFACTURER'].unique(), 0)
 
         if trafoManuf:
@@ -391,7 +391,7 @@ st.divider()
 
 coly, colx = st.columns(2)
 with colx:
-    uploadedFiles = st.file_uploader("Arrastra los excels y la imagen de la planta (formato png)", accept_multiple_files = True)
+    uploadedFiles = st.file_uploader("Arrastra los excels, la imagen de la planta (formato png), set de planos y PVsyst report (pdf)", accept_multiple_files = True)
 
 with coly:
     st.caption("Ejemplo de archivos")
@@ -408,27 +408,31 @@ with coly:
 for uploaded_file in uploadedFiles:
     if uploaded_file.name.endswith("xlsx"):
         if "ProjectSheet" in pd.ExcelFile(uploaded_file).sheet_names:
+            st.markdown('<span style="color:green">&#10004;</span> PVDesign excel', unsafe_allow_html=True)
             pvFile = uploaded_file
             aux_dic = rd.excelReaderPVD(uploaded_file, mainDic, rootEstructuras, dfModulos, user)
             mainDic.update(aux_dic)
             mainDic.update(lineasAereas(mainDic))
+            global flagCable
+            flagCable = 1
 
         elif (("Vallado") or ("C. V. (Formato Word)")) in pd.ExcelFile(uploaded_file).sheet_names:
+            st.markdown('<span style="color:green">&#10004;</span> Documentos delineantes ', unsafe_allow_html=True)
             df_parcelasVallado = DataFrame()
             df_parcelasLinea = DataFrame()
             df_centroTrafo = DataFrame()
             df_accesos = DataFrame()
-
             df_parcelasVallado, df_parcelasLinea, df_centroTrafo, df_accesos = rd.excelReaderCoordenadas(uploaded_file, mainDic)
 
         elif (("Planta")) in pd.ExcelFile(uploaded_file).sheet_names:
+            
             df_parcelasPlanta = DataFrame()
             df_parcelasTramo = DataFrame()
-
-            #Importing the tables from Viesgo
             df_parcelasPlanta, df_parcelasTramo = rd.excelReaderParcelas(uploaded_file, mainDic)
             
     elif uploaded_file.name.endswith("png"):
+        st.markdown('<span style="color:green">&#10004;</span> Fotografía planta', unsafe_allow_html=True)
+
         picFile = uploaded_file
         mainDic['tomaAerea'] = picFile.name
 
@@ -438,20 +442,24 @@ for uploaded_file in uploadedFiles:
 
         if "PVsyst" in word:
             PVsyst_file = uploaded_file
+            st.markdown('<span style="color:green">&#10004;</span> PVsyst', unsafe_allow_html=True)
 
         else:
             planos_file = uploaded_file
+            st.markdown('<span style="color:green">&#10004;</span> Planos pdf', unsafe_allow_html=True)
 
         # Datasheets se cogen según los datos
 
-        pass
+
+    
 
 
 
 # Parámetros de los inversores
-# st.divider()
+st.divider()
 try:
     if pvFile:
+        st.text("Cable encontrado: " + mainDic['faseNAereaCable'] + " "+ mainDic['faseAereaCable'])
 
         # Cambiamos ratioTrafoSET del PVD
         mainDic['ratioTrafoSET'] =  str(mainDic['ratioTrafoSET'].partition('/')[0]) + '/' + mainDic['tensionSET']
@@ -652,32 +660,34 @@ try:
     flagGenerar = st.button("Generar documento")
 
     # Preparamos los documentos de los anejos, arriba ya deberíamos tener el de planos y el del PVsyst (planos_file y PVsyst_file). Falta hacer merge de los datasheet según los parámetros escogidos
-
-    if ejes:
-        if ejes == "Bi-poste":
-            fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet biposte.pdf"
-        elif ejes == "Monoposte":
-            fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet monoposte.pdf"
-
-    if inverterManuf and inverterModel:
-        if inverterManuf == "Huawei Technologies":
-            if inverterModel == "SUN200-330KTL-H1":
-                fileInverterAnexo = "DATASHEETS/Inversores/Huawei_SUN200-330KTL-H1_datasheet_en.pdf"
-        elif inverterManuf == "Siemens Gamesa":
-            # De momento no importa qué modelo porque vienen todos en un mismo documento
-            fileInverterAnexo = "DATASHEETS/Inversores/ELE-Proteus-PV-Inverters.pdf"
-
-    if pvFile:
-        # De momento sólo usan un tipo de fabricantes
-        fileModulosAnexo = "DATASHEETS/Módulos/Datasheet_Vertex_DEG21C.20_EN_2021_PA4_DEG21C.20_2021_PA3_EN_20210309 (3).pdf"
-
-
-    # Estos 3 documentos pertenecen al último anexo, así que primero los unimos 
+    try:
+        if ejes:
+            if ejes == "Bi-poste":
+                fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet biposte.pdf"
+            elif ejes == "Monoposte":
+                fileEstructuraAnexo = "DATASHEETS/Estructuras/Datasheet monoposte.pdf"
     
-    anexFiles = [fileEstructuraAnexo, fileInverterAnexo,fileModulosAnexo]
+        if inverterManuf and inverterModel:
+            if inverterManuf == "Huawei Technologies":
+                if inverterModel == "SUN200-330KTL-H1":
+                    fileInverterAnexo = "DATASHEETS/Inversores/Huawei_SUN200-330KTL-H1_datasheet_en.pdf"
+            elif inverterManuf == "Siemens Gamesa":
+                # De momento no importa qué modelo porque vienen todos en un mismo documento
+                fileInverterAnexo = "DATASHEETS/Inversores/ELE-Proteus-PV-Inverters.pdf"
 
-    files_anexo3 = wt.pdfMerger(anexFiles) #devuelve un bytesIO, se accede con getvalue()
+        if pvFile:
+            # De momento sólo usan un tipo de fabricantes
+            fileModulosAnexo = "DATASHEETS/Módulos/Datasheet_Vertex_DEG21C.20_EN_2021_PA4_DEG21C.20_2021_PA3_EN_20210309 (3).pdf"
 
+
+        # Estos 3 documentos pertenecen al último anexo, así que primero los unimos 
+
+        anexFiles = [fileEstructuraAnexo, fileInverterAnexo,fileModulosAnexo]
+
+        files_anexo2 = wt.pdfMerger(anexFiles) #devuelve un bytesIO, se accede con getvalue()
+        
+    except Exception as e:
+        pass
     if flagGenerar and fileModelo:
         with st.spinner("Generando documento"):
             # Estilos especiales
@@ -737,13 +747,20 @@ try:
                 doc_anexoEquipos_bio.seek(0)
                 nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
 
-
-
-
                 doc_anexoPlanos_bio = io.BytesIO()
                 doc_anexoPlanos.save(doc_anexoPlanos_bio)
                 doc_anexoPlanos_bio.seek(0)
                 nameDocAnexoPlanos = 'Anexo Planos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
+                
+                # Anexo 1
+                doc_anexoCalculos_bio = wt.pdfInsert(doc_anexoCalculos_bio, PVsyst_file)
+               
+                # Anexo 2
+                doc_anexoEquipos_bio = wt.pdfInsert(doc_anexoEquipos_bio, files_anexo2)
+
+                # Anexo 3
+                doc_anexoPlanos_bio = wt.pdfInsert(doc_anexoPlanos_bio, planos_file, flagPlanos=1)
+
 
                 nameZip = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + str(mainDic['versionDoc']) + " " + ".zip"
                 zip_data = io.BytesIO()
@@ -755,13 +772,13 @@ try:
                     zipf.writestr(nameDocAnexoCalculos,doc_anexoCalculos_bio.getvalue())
                     zipf.writestr(nameDocAnexoEquipos, doc_anexoEquipos_bio.getvalue())
                     zipf.writestr(nameDocAnexoPlanos, doc_anexoPlanos_bio.getvalue())
-                    zipf.writestr("merged.pdftrials", files_anexo3.getvalue())
+                    # zipf.writestr("merged.pdf", files_anexo3.getvalue())
                     flagZip = 1
                     flagZip = [flagZip]
                     checkList = checkList + flagZip
                 
 
-        if all(element == 1 for element in checkList):
+        if all(element == 1 for element in checkList): # Si el usuario no decide meter los pvsyst o los planos, que no lo meta y descarga sólo el maindoc y las portadas
             st.info('¡Documento listo para descarga!')
             btn = st.download_button(
                 label="Descarga archivos",
