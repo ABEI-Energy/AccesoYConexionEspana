@@ -747,9 +747,6 @@ try:
                 doc_anexoEquipos_bio.seek(0)
                 nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
 
-
-
-
                 doc_anexoPlanos_bio = io.BytesIO()
                 doc_anexoPlanos.save(doc_anexoPlanos_bio)
                 doc_anexoPlanos_bio.seek(0)
@@ -757,13 +754,22 @@ try:
                 
                 # Anexo 1
                 doc_anexoCalculos_bio = wt.pdfInsert(doc_anexoCalculos_bio, PVsyst_file)
+                # doc_anexoCalculos_bio_pdf = wt.convert_docx_to_pdf(doc_anexoCalculos_bio)
                
                 # Anexo 2
                 doc_anexoEquipos_bio = wt.pdfInsert(doc_anexoEquipos_bio, files_anexo2)
+                # doc_anexoEquipos_bio_pdf = wt.convert_docx_to_pdf(doc_anexoEquipos_bio)
+
 
                 # Anexo 3
-                doc_anexoPlanos_bio = wt.pdfInsert(doc_anexoPlanos_bio, planos_file, flagPlanos=1)
+                # doc_anexoPlanos_bidoc_anexoEquipos_bio    o = wt.pdfInsert(doc_anexoPlanos_bio, planos_file, flagPlanos=1)
+                # Los planos se tienen que exportar en pdf
 
+                # Convertimos el docx en un pdf
+                doc_anexoPlanos_bio = wt.convert_docx_to_pdf(doc_anexoPlanos_bio)
+
+                #Juntamos la portada con los planos
+                anexoPlanosPdf = wt.pdfMerger([doc_anexoPlanos_bio, planos_file])  #devuelve un bytesIO, se accede con getvalue()
 
                 nameZip = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + str(mainDic['versionDoc']) + " " + ".zip"
                 zip_data = io.BytesIO()

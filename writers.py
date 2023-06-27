@@ -11,7 +11,7 @@ from docx.shared import Cm
 from PIL import Image
 
 import numToLet as ntl
-from PyPDF2 import PdfFileMerger, PdfFileReader
+from PyPDF2 import PdfFileMerger, PdfFileReader, PdfWriter
 import io
 
 #########################################################Doc readers
@@ -19,12 +19,14 @@ def doctopdf(docxFile):
     i = 0
     while i < 1:
         try:
-            d2p.convert(docxFile)
+            pdfFile = io.BytesIO()
+            pdfFile = d2p.convert(docxFile)
+            pdfFile.seek(0)
             i +=1
         except AttributeError:
             i +=1
             continue
-
+    return pdfFile
 
 def docDuplicate(docxFile):
 
@@ -334,10 +336,8 @@ def pdfInsert(docWord, docPdf,flagPlanos=0):
 
         for page_num in range(pdf_reader.numPages):
             # Extract the page from the PDF
-            page = pdf_reader.getPage(page_num)
-
             # Convert the page to an image (requires the 'pdf2image' library)
-            # Here, we assume you have the 'pdf2image' library installed
+
             from pdf2image import convert_from_bytes
             images = convert_from_bytes(docPdf.getvalue(), first_page=page_num+1, last_page=page_num+1)
             image_stream = io.BytesIO()
@@ -347,9 +347,9 @@ def pdfInsert(docWord, docPdf,flagPlanos=0):
             size = images[0].size
             imWidth = float(size[0])
             imHeight = float(size[1])                    
-            if imWidth > 17.32:
-                imHeight = imHeight*17.32/imWidth
-                imWidth = 17.32
+            if imWidth > 23.82:
+                imHeight = imHeight*23.82/imWidth
+                imWidth = 23.82
 
 
             run = docWord_in.paragraphs[-1].add_run()
@@ -402,4 +402,30 @@ def pdfInsert(docWord, docPdf,flagPlanos=0):
 
 
     return docWord_out
+
+# Function to convert DOCX to PDF
+def convert_docx_to_pdf(docx_data):
+
+
+    doc = Document(docx_data)
+
+    # Create a PDF writer
+    pdf_writer = PdfWriter()
+
+    # Iterate over each page in the DOCX document
+    for page_num, page in enumerate(doc.pages):
+        # Extract the content of the page as text
+        text = page.text
+
+        # Add the text to the PDF writer
+        pdf_writer.addPage(text)
+
+    # Convert the PDF writer to a bytes object
+    pdf_output = io.BytesIO()
+    pdf_writer.write(pdf_output)
+    pdf_output.seek(0)
+
+    return pdf_output
+
+
 
