@@ -309,7 +309,6 @@ def picWriter(docxFile, docxDict, rootLogos, logoC):
     flagPicWriter = 1
     return flagPicWriter
 
-
 def pdfMerger(files):
     tmp = io.BytesIO()
     merger = PdfFileMerger()
@@ -320,8 +319,6 @@ def pdfMerger(files):
     tmp.seek(0)
     # return tmp.getvalue()
     return tmp
-
-
 
 def pdfInsert(docWord, docPdf,flagPlanos=0):
     pdf_reader = PdfFileReader(docPdf)
