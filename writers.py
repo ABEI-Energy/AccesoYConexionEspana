@@ -316,7 +316,9 @@ def pdfMerger(files):
     merger = PdfFileMerger()
     for pdf in files:
         pdf = open(pdf,'rb')
-        merger.append(pdf)
+        merger.append(PdfFileReader(pdf))
+        # pdf = open(pdf,'rb')
+        # merger.append(pdf)
     merger.write(tmp)
     tmp.seek(0)
     # return tmp.getvalue()
