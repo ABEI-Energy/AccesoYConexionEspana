@@ -11,7 +11,7 @@ from docx.shared import Cm
 from PIL import Image
 
 import numToLet as ntl
-from PyPDF2 import PdfFileMerger, PdfFileReader, PdfWriter
+from PyPDF2 import PdfFileMerger, PdfFileReader, PdfWriter, PdfReader
 import io
 
 #########################################################Doc readers
@@ -315,7 +315,7 @@ def pdfMerger(files):
     tmp = io.BytesIO()
     merger = PdfFileMerger()
     for pdf in files:
-        merger.append(PdfFileReader(pdf))
+        merger.append(PdfReader(pdf))
         # pdf = open(pdf,'rb')
         # merger.append(pdf)
     merger.write(tmp)
