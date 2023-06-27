@@ -736,29 +736,33 @@ try:
                 doc_modelo.save(doc_modelo_bio)
                 doc_modelo_bio.seek(0)
                 nameDocModelo = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + ".docx"
+                st.markdown('<span style="color:green">&#10004;</span> Documento AyC', unsafe_allow_html=True)
 
                 doc_anexoCalculos_bio = io.BytesIO()
                 doc_anexoCalculos.save(doc_anexoCalculos_bio)
                 doc_anexoCalculos_bio.seek(0)
                 nameDocAnexoCalculos = 'Anexo Calculos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
+                st.markdown('<span style="color:green">&#10004;</span> Anexo cálculos', unsafe_allow_html=True)
 
                 doc_anexoEquipos_bio = io.BytesIO()
                 doc_anexoEquipos.save(doc_anexoEquipos_bio)
                 doc_anexoEquipos_bio.seek(0)
-                nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
 
                 doc_anexoPlanos_bio = io.BytesIO()
                 doc_anexoPlanos.save(doc_anexoPlanos_bio)
                 doc_anexoPlanos_bio.seek(0)
                 nameDocAnexoPlanos = 'Anexo Planos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
                 
+                
                 # Anexo 1
                 doc_anexoCalculos_bio = wt.pdfInsert(doc_anexoCalculos_bio, PVsyst_file)
                 # doc_anexoCalculos_bio_pdf = wt.convert_docx_to_pdf(doc_anexoCalculos_bio)
+                nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
                
                 # Anexo 2
                 doc_anexoEquipos_bio = wt.pdfInsert(doc_anexoEquipos_bio, files_anexo2)
                 # doc_anexoEquipos_bio_pdf = wt.convert_docx_to_pdf(doc_anexoEquipos_bio)
+                st.markdown('<span style="color:green">&#10004;</span> Anexo equipos', unsafe_allow_html=True)
 
 
                 # Anexo 3
@@ -770,6 +774,7 @@ try:
 
                 #Juntamos la portada con los planos
                 anexoPlanosPdf = wt.pdfMerger([doc_anexoPlanos_bio, planos_file])  #devuelve un bytesIO, se accede con getvalue()
+                st.markdown('<span style="color:green">&#10004;</span> Anexo planos', unsafe_allow_html=True)
 
                 nameZip = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + str(mainDic['versionDoc']) + " " + ".zip"
                 zip_data = io.BytesIO()
