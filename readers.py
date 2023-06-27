@@ -10,7 +10,7 @@ import unidecode as ud
 from docx import Document
 from docx.shared import Cm
 from openpyxl import load_workbook
-# import PyPDF2 as rpdf
+import PyPDF2 as rpdf
 
 
 import numToLet as ntl
@@ -284,9 +284,9 @@ def excelReaderParcelas(excel, mainDic):
 
 
 
-# def reader(pdfFile,page):
+def reader(pdfFile,page):
 
-#     docPdf = rpdf.PdfReader(pdfFile).pages[page].extract_text()
+    docPdf = rpdf.PdfReader(pdfFile).pages[page].extract_text()
 
-#     return docPdf
+    return docPdf
 

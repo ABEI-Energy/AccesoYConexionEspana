@@ -3,11 +3,16 @@ from math import *
 import docx2pdf as d2p
 import pandas as pd
 from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.section import WD_ORIENT
+from docx.enum.section import WD_SECTION
+
 from docx.shared import Cm
 from PIL import Image
 
 import numToLet as ntl
-
+from PyPDF2 import PdfFileMerger, PdfFileReader
+import io
 
 #########################################################Doc readers
 def doctopdf(docxFile):
@@ -264,9 +269,6 @@ def picWriter(docxFile, docxDict, rootLogos, logoC):
     docxDict['logoC'] = rootLogos + "/" + docxDict['logoC']
     docxDict['logoH'] = rootLogos + "/" + docxDict['logoH']
 
-    import io
-
-    import streamlit as st
 
     for table in docxFile.tables:
         for row in table.rows:
@@ -307,229 +309,100 @@ def picWriter(docxFile, docxDict, rootLogos, logoC):
     flagPicWriter = 1
     return flagPicWriter
 
-'''
-def picWriter(docxFile, docxDict, rootLogos):
 
-    docxDict['logoC'] = rootLogos + "/" + docxDict['logoC']
-    docxDict['logoH'] = rootLogos + "/" + docxDict['logoH']
+def pdfMerger(files):
+    tmp = io.BytesIO()
+    merger = PdfFileMerger()
+    for pdf in files:
+        pdf = open(pdf,'rb')
+        merger.append(pdf)
+    merger.write(tmp)
+    tmp.seek(0)
+    # return tmp.getvalue()
+    return tmp
+
+
+
+def pdfInsert(docWord, docPdf,flagPlanos=0):
+    pdf_reader = PdfFileReader(docPdf)
+    docWord_in = Document(docWord)
+
+    if flagPlanos == 1:
+        current_section = docWord_in.sections[-1]
+        new_width, new_height = current_section.page_height, current_section.page_width
+        new_section = docWord_in.add_section(WD_SECTION.NEW_PAGE)
+        new_section.orientation = WD_ORIENT.LANDSCAPE
+        new_section.page_width = new_width
+        new_section.page_height = new_height
+
+        for page_num in range(pdf_reader.numPages):
+            # Extract the page from the PDF
+            page = pdf_reader.getPage(page_num)
+
+            # Convert the page to an image (requires the 'pdf2image' library)
+            # Here, we assume you have the 'pdf2image' library installed
+            from pdf2image import convert_from_bytes
+            images = convert_from_bytes(docPdf.getvalue(), first_page=page_num+1, last_page=page_num+1)
+            image_stream = io.BytesIO()
+            images[0].save(image_stream, format='PNG')
+            image_stream.seek(0)
+
+            size = images[0].size
+            imWidth = float(size[0])
+            imHeight = float(size[1])                    
+            if imWidth > 17.32:
+                imHeight = imHeight*17.32/imWidth
+                imWidth = 17.32
+
+
+            run = docWord_in.paragraphs[-1].add_run()
+            run.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run.add_picture(image_stream, width = Cm(imWidth), height = Cm(imHeight))
+            run.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+
+            docWord_out = io.BytesIO()
+            docWord_in.save(docWord_out)
+            docWord_out.seek(0)
+            # Close the image stream
+            image_stream.close()
+
+    else:
+
+        # Pasamos el documento ya en bytesIo
+         # Iterate over each page in the PDF
+
+        for page_num in range(pdf_reader.numPages):
+            # Extract the page from the PDF
+            page = pdf_reader.getPage(page_num)
+
+            # Convert the page to an image (requires the 'pdf2image' library)
+            # Here, we assume you have the 'pdf2image' library installed
+            from pdf2image import convert_from_bytes
+            images = convert_from_bytes(docPdf.getvalue(), first_page=page_num+1, last_page=page_num+1)
+            image_stream = io.BytesIO()
+            images[0].save(image_stream, format='PNG')
+            image_stream.seek(0)
+
+            size = images[0].size
+            imWidth = float(size[0])
+            imHeight = float(size[1])                    
+            if imWidth > 17.32:
+                imHeight = imHeight*17.32/imWidth
+                imWidth = 17.32
+
+            run = docWord_in.paragraphs[-1].add_run()
+            run.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run.add_picture(image_stream, width = Cm(imWidth), height = Cm(imHeight))
+            run.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+
+            docWord_out = io.BytesIO()
+            docWord_in.save(docWord_out)
+            docWord_out.seek(0)
+            # Close the image stream
+            image_stream.close()
+
+
+    return docWord_out
 
-    import io
-    import streamlit as st
-
-    for table in docxFile.tables:
-        for row in table.rows:
-            for cell in row.cells:
-                if "logoC" in cell.text:
-                    image = Image.open(docxDict['logoC'])
-                    st.image(image, caption='Uploaded Image', use_column_width=True)
-
-                    logoC = io.BytesIO()
-                    image.save(logoC, format = 'PNG')
-                    logoC.seek(0)
-                    cell.text = ""
-                    r = cell.paragraphs[0].add_run()
-                    r.add_picture(logoC, width = Cm(7.0), height = Cm(4.5))
-                if ("tomaAerea" in cell.text) and (docxDict['tomaAerea'] != "pass"):
-                    cell.text = ""
-                    r = cell.paragraphs[0].add_run()
-                    r.add_picture(docxDict['tomaAerea'], width = Cm(16.55), height = Cm(6.05))
-                if ("figuraStruct" in cell.text) and (docxDict['figuraStruct'] != "pass"):
-                    cell.text = ""
-                    r = cell.paragraphs[0].add_run()
-                    r.add_picture(docxDict['figuraStruct'], width = Cm(6.95), height = Cm(5.1))                        
-                    
-    #Headers
-    for section in docxFile.sections:
-        for table in section.header.tables:
-            for row in table.rows:
-                for cell in row.cells:
-                    if "logoH" in cell.text:
-                        cell.text = ""
-                        r = cell.paragraphs[0].add_run()
-                        r.add_picture(docxDict['logoH'], width = Cm(2.75), height = Cm(1.75))         
-    print("Imagenes insertadas") 
-
-    flagPicWriter = 1
-    return flagPicWriter
-
-'''
-
-
-
-'''
-
-
-
-from docx import Document
-
-from PyPDF2 import PdfFileReader
-
-from io import BytesIO
-
-
-
-def insert_pdf_pages_into_word(pdf_bytes, word_path):
-
-    # Create a BytesIO object from the PDF bytes
-
-    pdf_stream = BytesIO(pdf_bytes)
-
-
-
-    # Open the PDF stream
-
-    pdf_reader = PdfFileReader(pdf_stream)
-
-
-
-    # Create a new Word document
-
-    document = Document()
-
-
-
-    # Iterate over each page in the PDF
-
-    for page_num in range(pdf_reader.numPages):
-
-        # Extract the page from the PDF
-
-        page = pdf_reader.getPage(page_num)
-
-
-
-        # Convert the page to an image (requires the 'pdf2image' library)
-
-        # Here, we assume you have the 'pdf2image' library installed
-
-        from pdf2image import convert_from_path
-
-        images = convert_from_path(pdf_stream, first_page=page_num+1, last_page=page_num+1)
-
-        image_stream = BytesIO()
-
-        images[0].save(image_stream, format='PNG')
-
-        image_stream.seek(0)
-
-
-
-        # Insert the image into the Word document
-
-        document.add_picture(image_stream)
-
-
-
-        # Close the image stream
-
-        image_stream.close()
-
-
-
-    # Save the Word document
-
-    document.save(word_path)
-
-
-
-# Example usage
-
-with open('input.pdf', 'rb') as pdf_file:
-
-    pdf_bytes = pdf_file.read()
-
-
-
-insert_pdf_pages_into_word(pdf_bytes, 'output.docx')
-
-
-
-'''
-
-
-
-'''
-
-
-
-from docx import Document
-
-from PyPDF2 import PdfFileReader
-
-from io import BytesIO
-
-
-
-def insert_pdf_pages_into_word(pdf_file, word_path):
-
-    # Create a BytesIO object from the PDF file content
-
-    pdf_stream = BytesIO(pdf_file.read())
-
-
-
-    # Open the PDF stream
-
-    pdf_reader = PdfFileReader(pdf_stream)
-
-
-
-    # Create a new Word document
-
-    document = Document()
-
-
-
-    # Iterate over each page in the PDF
-
-    for page_num in range(pdf_reader.numPages):
-
-        # Extract the page from the PDF
-
-        page = pdf_reader.getPage(page_num)
-
-
-
-        # Convert the page to an image (requires the 'pdf2image' library)
-
-        # Here, we assume you have the 'pdf2image' library installed
-
-        from pdf2image import convert_from_path
-
-        images = convert_from_path(pdf_stream, first_page=page_num+1, last_page=page_num+1)
-
-        image_stream = BytesIO()
-
-        images[0].save(image_stream, format='PNG')
-
-        image_stream.seek(0)
-
-
-
-        # Insert the image into the Word document
-
-        document.add_picture(image_stream)
-
-
-
-        # Close the image stream
-
-        image_stream.close()
-
-
-
-    # Save the Word document
-
-    document.save(word_path)
-
-
-
-# Example usage
-
-pdf_file = request.files['pdf']  # Assuming the PDF file is obtained from a web request
-
-insert_pdf_pages_into_word(pdf_file, 'output.docx')
-
-
-
-'''
