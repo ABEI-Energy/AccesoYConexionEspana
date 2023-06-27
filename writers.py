@@ -315,7 +315,6 @@ def pdfMerger(files):
     tmp = io.BytesIO()
     merger = PdfFileMerger()
     for pdf in files:
-        pdf = open(pdf,'rb')
         merger.append(PdfFileReader(pdf))
         # pdf = open(pdf,'rb')
         # merger.append(pdf)
