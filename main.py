@@ -747,6 +747,9 @@ try:
                 doc_anexoEquipos_bio.seek(0)
                 nameDocAnexoEquipos = 'Anexo Equipos AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + mainDic['versionDoc'] + " " + ".docx"
 
+
+
+
                 doc_anexoPlanos_bio = io.BytesIO()
                 doc_anexoPlanos.save(doc_anexoPlanos_bio)
                 doc_anexoPlanos_bio.seek(0)
