@@ -766,7 +766,7 @@ try:
                 # Los planos se tienen que exportar en pdf
 
                 # Convertimos el docx en un pdf
-                doc_anexoPlanos_bio = wt.convert_docx_to_pdf(doc_anexoPlanos_bio)
+                # doc_anexoPlanos_bio = wt.convert_docx_to_pdf(doc_anexoPlanos_bio)
 
                 #Juntamos la portada con los planos
                 anexoPlanosPdf = wt.pdfMerger([doc_anexoPlanos_bio, planos_file])  #devuelve un bytesIO, se accede con getvalue()
