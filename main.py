@@ -773,7 +773,8 @@ try:
                 # doc_anexoPlanos_bio = wt.convert_docx_to_pdf(doc_anexoPlanos_bio)
 
                 #Juntamos la portada con los planos
-                anexoPlanosPdf = wt.pdfMerger([doc_anexoPlanos_bio, planos_file])  #devuelve un bytesIO, se accede con getvalue()
+                #Ojo que tiene que convertir primero doc_anexoPlanos a pdf.
+                # anexoPlanosPdf = wt.pdfMerger([doc_anexoPlanos_bio, planos_file])  #devuelve un bytesIO, se accede con getvalue()
                 st.markdown('<span style="color:green">&#10004;</span> Anexo planos', unsafe_allow_html=True)
 
                 nameZip = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + str(mainDic['versionDoc']) + " " + ".zip"
