@@ -8,7 +8,7 @@ import streamlit as st
 import streamlit_toggle as tog
 from docx.shared import Cm
 import PyPDF2 
-
+import json
 import coordinates as cd
 import numToLet as ntl
 import post as ps
@@ -779,6 +779,15 @@ try:
 
                 nameZip = 'AyC ' + mainDic['nombreProyecto'] + " " + "Ed." + str(mainDic['versionDoc']) + " " + ".zip"
                 zip_data = io.BytesIO()
+                
+                # Save the dictionaries
+                dic = {}
+                for i, item in mainDic.items(): 
+                    dic[i] = str(item)
+                json_dic = json.dumps(dic, indent = 4)
+                json_io = io.StringIO(json_dic)
+                json_io.seek(0)      
+
 
                 # Create a ZipFile Object
                 with ZipFile(zip_data, 'w') as zipf:
@@ -787,6 +796,7 @@ try:
                     zipf.writestr(nameDocAnexoCalculos,doc_anexoCalculos_bio.getvalue())
                     zipf.writestr(nameDocAnexoEquipos, doc_anexoEquipos_bio.getvalue())
                     zipf.writestr(nameDocAnexoPlanos, doc_anexoPlanos_bio.getvalue())
+                    zipf.writestr("dictionary.json", json_io.getvalue())
                     # zipf.writestr("merged.pdf", files_anexo3.getvalue())
                     flagZip = 1
                     flagZip = [flagZip]
