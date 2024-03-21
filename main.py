@@ -316,7 +316,7 @@ if proyectoTipo == "Fotovoltáico":
             mainDic['tensionCeldaAsignada'] = dfCeldas.loc[dfCeldas['TENSION NOMINAL']== float(mainDic['tensionSET']),'CORRIENTE ASIGNADA EN SERVICIO EMBARRADO'].item()
 
 
-# mainDic['direccionSociedad'] = dfSociedad.loc[dfSociedad['NOMBRE']==mainDic['nombreSociedad'],'DIRECCIÓN'].item()
+        # mainDic['direccionSociedad'] = dfSociedad.loc[dfSociedad['NOMBRE']==mainDic['nombreSociedad'],'DIRECCIÓN'].item()
 
 
         with col8:
@@ -403,8 +403,6 @@ with coly:
             mime="application/zip"
         )
 
-
-
 for uploaded_file in uploadedFiles:
     if uploaded_file.name.endswith("xlsx"):
         if "ProjectSheet" in pd.ExcelFile(uploaded_file).sheet_names:
@@ -449,11 +447,6 @@ for uploaded_file in uploadedFiles:
             st.markdown('<span style="color:green">&#10004;</span> Planos pdf', unsafe_allow_html=True)
 
         # Datasheets se cogen según los datos
-
-
-    
-
-
 
 # Parámetros de los inversores
 st.divider()
