@@ -297,7 +297,7 @@ if proyectoTipo == "Fotovoltáico":
     lineaTipo = st.radio("Selecciona el tipo de cable",( "Aéreo", "Subterraneo"))
     mainDic['lineaTipo'] = lineaTipo
 
-    if lineaTipo == "Aéreo":
+    if (lineaTipo == "Aéreo") or (lineaTipo == 'Subterraneo'):
         
         col8, col9, col10= st.columns(3)
         st.divider()
@@ -410,7 +410,11 @@ for uploaded_file in uploadedFiles:
             pvFile = uploaded_file
             aux_dic = rd.excelReaderPVD(uploaded_file, mainDic, rootEstructuras, dfModulos, user)
             mainDic.update(aux_dic)
-            mainDic.update(lineasAereas(mainDic))
+            if mainDic['lineaTipo'] == 'Aéreo':
+                mainDic.update(lineasAereas(mainDic))
+            elif mainDic['lineaTipo'] == 'Subterraneo':
+                pass
+
             global flagCable
             flagCable = 1
 
@@ -452,7 +456,8 @@ for uploaded_file in uploadedFiles:
 st.divider()
 try:
     if pvFile:
-        st.text("Cable encontrado: " + mainDic['faseNAereaCable'] + " "+ mainDic['faseAereaCable'])
+        if lineaTipo == "Aéreo":
+            st.text("Cable encontrado: " + mainDic['faseNAereaCable'] + " "+ mainDic['faseAereaCable'])
 
         # Cambiamos ratioTrafoSET del PVD
         mainDic['ratioTrafoSET'] =  str(mainDic['ratioTrafoSET'].partition('/')[0]) + '/' + mainDic['tensionSET']
