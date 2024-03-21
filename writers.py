@@ -65,8 +65,8 @@ def docWriter(docxFile,docxDict):
     # coverKeys = ["municipioProjC","provinciaProjC", "ccaaProjC","dateCoverC", "versionDocC", "potPicoC", "potInstaladaC","nombreProyectoC"]
     # [docxDict.pop(key) for key in coverKeys]
 
-    priceKeys = {"precioModulo":'', "precioTrafo":'', "precioEstruct":'', "precioInvert":'', "equiposTotal":'', "totalPrecioP":'', "totalPrecioPIvaP":'', "totalPPrecio":'', "subtotal":'', "sub5":'', "ind10":'', "totalLP":'', "totalLPIva":''}
-    docxDict.update(priceKeys)
+    # priceKeys = {"precioModulo":'', "precioTrafo":'', "precioEstruct":'', "precioInvert":'', "equiposTotal":'', "totalPrecioP":'',  "subtotal":'', "sub5":'', "ind10":'', "totalLP":''}
+    # docxDict.update(priceKeys)
 
     #Table values in general
 
@@ -74,6 +74,8 @@ def docWriter(docxFile,docxDict):
         for row in table.rows:
             for cell in row.cells:
                 if "COD." in cell.text:
+                    priceKeys = {"precioModulo":'', "precioTrafo":'', "precioEstruct":'', "precioInvert":'', "equiposTotal":'', "totalPrecioP":'',  "subtotal":'', "sub5":'', "ind10":'', "totalLP":''}
+                    docxDict.update(priceKeys)
                     df = [['' for i in range(len(table.columns))] for j in range(len(table.rows))]
                     for i, row in enumerate(table.rows):
                         for j, cell in enumerate(row.cells):

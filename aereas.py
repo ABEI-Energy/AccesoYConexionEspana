@@ -154,7 +154,7 @@ def lineasAereas(dicLineas):
             dicLineas['faseAereaCable'] = cable
             dicLineas['sizemm2'] = sizemm2
             dicLineas['potMaxAereaCirc'] = round(potTernaMax*nCirc,2)
-            dicLineas['ImaxAereaConduct'] = datasheet.iloc[i][17]
+            dicLineas['ImaxAereaConduct'] = round(datasheet.iloc[i][17],2)
             dicLineas['faseNAereaTierra'] = "48"
             dicLineas['faseAereaTierra'] = "OPGW Tipo 1 17kA – 15,3 mm"
             break
